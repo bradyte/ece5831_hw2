@@ -74,13 +74,13 @@ def readImages(path, sz=None):
 [trainingFaces,trainingFacesNum] = readImages('/Users/tbrady/drive/sw/att_faces/')
 
 # create a matrix of y columns where each image is stored in one row
-trainingFaceMatrix = np.empty((trainingFaces[0].size, 0), dtype='float64')
+L = np.empty((trainingFaces[0].size, 0), dtype='float64')
 for col in trainingFaces:
-    trainingFaceMatrix = np.hstack((trainingFaceMatrix ,np.asarray(col).reshape(-1, 1)))
+    L = np.hstack((L ,np.asarray(col).reshape(-1, 1)))
 
-averageFaceVector   = np.array(trainingFaceMatrix.mean(axis=1))
+averageFaceVector   = np.array(L.mean(axis=1))
 
-phiMatrix           = (trainingFaceMatrix.transpose() - averageFaceVector).transpose()
+phiMatrix           = (L.transpose() - averageFaceVector).transpose()
 
 eigenMatrix         = np.dot(phiMatrix.T,phiMatrix)
 [eigenvalues ,eigenvectors] = np.linalg.eig(eigenMatrix)
@@ -89,13 +89,13 @@ eigenvalues         = eigenvalues[idx]
 eigenvectors        = eigenvectors[:,idx]
 
 
-numComponents       = 4
+numComponents       = 50
 eigenvalues         = eigenvalues[0:numComponents].copy()
 eigenvectors        = eigenvectors[:, 0:numComponents].copy()
 
-eigenvectors        = np.dot(trainingFaceMatrix, eigenvectors)
-norms               = np.linalg.norm(eigenvectors, axis=0)
-eigenvectors /= norms
+eigenvectors        = np.dot(L, eigenvectors)
+#norms               = np.linalg.norm(eigenvectors, axis=0)
+#eigenvectors        /= norms
 
 
 
@@ -105,17 +105,36 @@ def printVector(v):
     plt.imshow(e)
 
 E = []
-for i in range(min(len(trainingFaceMatrix), numComponents)):
+for i in range(min(len(L), 4)):
     e = eigenvectors[:,i].reshape(trainingFaces[0].shape)
     E.append(normalize(e,0,255))
 #    # plot them and store the plot to "python_eigenfaces.pdf"
 
-subplot(title="Eigenfaces", images=E, rows=numComponents/4, \
+subplot(title="Eigenfaces", images=E, rows=1, \
         cols=4, sptitle=" Eigenface", colormap=cm.binary, \
         filename="python_pca_eigenfaces.png")
 
-face = trainingFaceMatrix[:,0] - averageFaceVector
-newFace = np.dot(eigenvectors[:,0].T,face)
+##steps = [i for i in range(10, min(len(trainingFaceMatrix),320), 20)]
+steps = [10,20]
+E = []
+for i in range(min(len(steps),16)):
+    numEvs = steps[i]
+#    P = project(eigenvectors[:,0:numEvs],trainingFaces[0].reshape(-1, 1) , averageFaceVector)
+    dotFace = np.dot(L[:,0:numEVs] - averageFaceVector, eigenvectors[:,0:numEVs])
+#    R = reconstruct(eigenvectors[:,0:numEvs ], P , averageFaceVector)
+#    
+#    
+#    R = R.reshape(trainingFaces[0].shape)
+#    E.append(normalize(R,0,255))
+
+
+
+
+
+
+w = np.dot(eigenvectors[:,0], trainingFaceMatrix[:,0] - averageFaceVector)
+printVector(averageFaceVector + np.dot(dotFace,eigenvectors[:,0].T))
+
 #
 #def project (W, X ,mu = None):
 #    if mu is None :
