@@ -37,7 +37,7 @@ E           = []                                # new array containing faces
 for i in range(0, numFaces):
     e       = U[:,i].reshape(dims)              # reshape the vector to the original picture size m x n
     E.append(normalize(e,0,255))                # append to the face array
-subplot(title="Eigenfaces", images=E, sptitle=" Eigenface", colormap=cm.gist_yarg)
+#subplot(title="Eigenfaces", images=E, sptitle=" Eigenface", colormap=cm.gist_yarg)
 
 ### reconstruct random test face from computed eigenfaces
 #[testFace, count] = readImages('/Users/tbrady/drive/sw/test_faces/')
@@ -46,21 +46,23 @@ subplot(title="Eigenfaces", images=E, sptitle=" Eigenface", colormap=cm.gist_yar
 #T = np.reshape(testFace, testFace[0].size)
 #
 
-## face to reconstruct 
-#T = L[:,0]
-## number of eigenfaces to use    
-#faces = [10, 50, 100, 150, 200, 250, 300, 350]
-## start with the average face
-#reconFace = meanVector
-#
-#psi = T - meanVector
-#
-##for j in range(0, len(faces)):
-#R = []
-#reconFace = meanVector
-#j = 3
-#w = np.dot(U[:,0:faces[j]].T, psi)
-#for i in range(0,faces[j]):
-#    reconFace += w[i]*U[:,i]
-#
-##printVector(reconFace, dims)
+# face to reconstruct 
+T = L[:,0]
+# number of eigenfaces to use    
+faces = [10, 50, 100, 150, 200, 250, 300, 350]
+# start with the average face
+reconFace = meanVector
+
+psi = T - meanVector
+
+#for j in range(0, len(faces)):
+R = []
+reconFace = meanVector
+j = 7
+w = np.dot(U[:,0:faces[j]].T, psi)
+for i in range(0,faces[j]):
+    reconFace += w[i]*U[:,i]
+
+printVector(reconFace, dims)
+rmse = np.sqrt(((reconFace - T) ** 2).mean())
+print(rmse)
