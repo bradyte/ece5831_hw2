@@ -20,43 +20,24 @@ def printVector(v, dims):
     plt.axis('off')
     plt.imshow(e, cmap=cm.gray)
     
-    
-    
-
-def normalize(X, low, high, dtype=None):
+def normalize(X, low, high):
     X = np.asarray(X)
     minX , maxX = np.min(X), np.max(X)
-    # normalize to [0...1].
-    X = X - float(minX)
-    X = X / float((maxX - minX))
-    # scale to [low...high].
-    X = X * (high-low)
-    X = X + low
-    if dtype is None:
-        return np.asarray(X)
-    return np.asarray(X, dtype=dtype) 
+    X = (X - float(minX)) / float((maxX - minX))        # normalize
+    X = X * (high-low) + low                            # scale from low to high
+    return np.asarray(X) 
 
 
-def subplot(title, images, rows, cols, sptitle="subplot", \
-            sptitles=[], colormap=cm.gray, ticks_visible=True,\
-            filename=None):
+def subplot(title, images, sptitle='subplot', colormap=cm.gray):
     fig = plt.figure()
-    # main title
-    fig.text(.5, .95, title, horizontalalignment='center')
+    fig.suptitle(title, horizontalalignment='center')
+    
     for i in range(len(images)):
-        ax0 = fig.add_subplot(rows,cols,(i+1))
-        plt.setp(ax0.get_xticklabels(), visible=False)
-        plt.setp(ax0.get_yticklabels(), visible=False)
-#        if len(sptitles) == len(images):
-#            plt.title("%s #%s" % (sptitle, str(sptitles[i])))
-#        else:
-#            plt.title("%s #%d" % (sptitle, (i+1)))
+        ax0 = fig.add_subplot(2, 4,(i+1))
+        plt.title('#%d %s' % ((i+1), sptitle), fontsize = 10)
         plt.imshow(np.asarray(images[i]), cmap=colormap)
         plt.axis('off')
-    if filename is None:
-        plt.show()
-    else:
-        fig.savefig(filename)
+
 
 # read in all the images
 def readImages(path, sz=None): 

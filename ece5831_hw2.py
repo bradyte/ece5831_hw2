@@ -5,66 +5,39 @@ Created on Wed Nov  8 21:25:26 2017
 
 @author: tombrady
 """
-
 import numpy as np
 from cleanup import *
 
 
 if 1:
-    # read in the faces and number of images
-    [trainingFaces,trainingFacesCount] = readImages('/Users/tbrady/drive/sw/att_faces/')
-    
-    # dimensions of the picture size
-    dims = trainingFaces[0].shape
-    
-    # initialize an empty vector of m x n length
-    L = np.empty((trainingFaces[0].size, 0), dtype='float64')
-    
-    # create a matrix, gamma, of image vectors as long as the number of faces
-    for col in trainingFaces:
+## read in faces
+    fpath   = '/Users/tbrady/drive/sw/att_faces/'
+    [tFaces,tFacesCount] = readImages(fpath)    # read in the faces and number of images
+    dims    = tFaces[0].shape                   # dimensions m, n of the picture size
+    vecLen  = tFaces[0].size                    # length of the gamma vector m x n
+
+## being PCA 
+    L = np.empty((vecLen, 0), dtype='float64')  # initialize an empty vector of m x n length
+    for col in tFaces:                          # create a matrix, gamma, of image vectors as long as the number of faces
         L = np.hstack((L ,np.asarray(col).reshape(-1, 1)))
-    
-    # average the vectors to create and average face
-    meanVector  = np.array(L.mean(axis=1))
-    
-    # subtract the mean vector from the original images
-    #t he double transpose is due to how the vectors are handled in numpy
-    A       = (L.T - meanVector).T
-    
-    # the dot product of transposed difference matrix and original matrix
-    C       = np.dot(A.T,A)
-    
-    # calculate the eigenvectors and eigenvalues
-    [v, u]  = np.linalg.eig(C)
-    
-    # sort them by largest eigenvalues
-    idx     = np.argsort(-v)
-    
-    # reorganize the eigenvalues by the sorted index
-    v       = v[idx]
-    
-    # reorganize the eigenvectors by the sorted index
-    u       = u[:,idx]
-    
-    # create the eigen faces
-    U       = np.dot(A, u) 
-    
-    # normalize the eigenface matrix U   
-    U       = U / np.linalg.norm(U, axis=0)
+    meanVector  = np.array(L.mean(axis=1))      # average the vectors to create and average face
+#    printVector(meanVector, dims)               # display the average face
+    A       = (L.T - meanVector).T              # subtract the mean vector from the original images
+    C       = np.dot(A.T,A)                     # the dot product of transposed difference matrix and original matrix
+    [v, u]  = np.linalg.eig(C)                  # calculate the eigenvectors and eigenvalues
+    idx     = np.argsort(-v)                    # sort them by largest eigenvalues
+    v       = v[idx]                            # reorganize the eigenvalues by the sorted index
+    u       = u[:,idx]                          # reorganize the eigenvectors by the sorted index
+    U       = np.dot(A, u)                      # create the eigenfaces
+    U       = U / np.linalg.norm(U, axis=0)     # normalize the eigenface matrix U 
 
 ## display eigenfaces
-#numFaces = 8
-#E = []
-#for i in range(0, numFaces):
-#    e = U[:,i].reshape(dims)
-#    E.append(normalize(e,0,255))
-#
-##printVector(meanVector, dims)
-#
-#subplot(title="Eigenfaces", images=E, rows=numFaces/4, \
-#        cols=4, sptitle=" Eigenface", colormap=cm.gist_yarg, \
-#        filename="python_pca_eigenfaces.png")
-
+numFaces    = 8                                 # number of faces to show
+E           = []                                # new array containing faces
+for i in range(0, numFaces):
+    e       = U[:,i].reshape(dims)              # reshape the vector to the original picture size m x n
+    E.append(normalize(e,0,255))                # append to the face array
+subplot(title="Eigenfaces", images=E, sptitle=" Eigenface", colormap=cm.gist_yarg)
 
 ### reconstruct random test face from computed eigenfaces
 #[testFace, count] = readImages('/Users/tbrady/drive/sw/test_faces/')
@@ -72,16 +45,22 @@ if 1:
 #T = np.empty((testFace[0].size, 0), dtype='float64')
 #T = np.reshape(testFace, testFace[0].size)
 #
-#faces = 400
-#
+
+## face to reconstruct 
+#T = L[:,0]
+## number of eigenfaces to use    
+#faces = [10, 50, 100, 150, 200, 250, 300, 350]
+## start with the average face
 #reconFace = meanVector
-##
+#
 #psi = T - meanVector
-#w = np.dot(U[:,0].T, psi)
-#w = np.dot(U[:,0:faces].T, psi)
-#for i in range(0,faces):
+#
+##for j in range(0, len(faces)):
+#R = []
+#reconFace = meanVector
+#j = 3
+#w = np.dot(U[:,0:faces[j]].T, psi)
+#for i in range(0,faces[j]):
 #    reconFace += w[i]*U[:,i]
 #
-#printVector(reconFace, dims)
-
-
+##printVector(reconFace, dims)
