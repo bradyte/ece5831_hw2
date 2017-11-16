@@ -18,7 +18,7 @@ def printVector(v, dims):
     e = v.reshape(dims)
     e = normalize(e,0,255)
     plt.axis('off')
-    plt.imshow(e, cmap=cm.binary)
+    plt.imshow(e, cmap=cm.gray)
     
     
     

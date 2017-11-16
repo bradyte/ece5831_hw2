@@ -5,12 +5,8 @@ Created on Wed Nov  8 21:25:26 2017
 
 @author: tombrady
 """
-import sys, os
-sys.path.append("../..")
+
 import numpy as np
-from PIL import Image
-import matplotlib.cm as cm
-import matplotlib.pyplot as plt
 from cleanup import *
 
 
@@ -28,8 +24,6 @@ if 1:
     for col in trainingFaces:
         L = np.hstack((L ,np.asarray(col).reshape(-1, 1)))
     
-#    for col in L:
-#        L[:,int(col)] = (L[:,int(col)]/ np.linalg.norm(L[:,int(col)], axis=1))
     # average the vectors to create and average face
     meanVector  = np.array(L.mean(axis=1))
     
@@ -53,29 +47,36 @@ if 1:
     u       = u[:,idx]
     
     # create the eigen faces
-    U       = np.dot(A, u)  
-
+    U       = np.dot(A, u) 
+    
     # normalize the eigenface matrix U   
-    U       = (U.T / np.linalg.norm(U, axis=1)).T
+    U       = U / np.linalg.norm(U, axis=0)
+
+## display eigenfaces
+#numFaces = 8
+#E = []
+#for i in range(0, numFaces):
+#    e = U[:,i].reshape(dims)
+#    E.append(normalize(e,0,255))
+#
+##printVector(meanVector, dims)
+#
+#subplot(title="Eigenfaces", images=E, rows=numFaces/4, \
+#        cols=4, sptitle=" Eigenface", colormap=cm.gist_yarg, \
+#        filename="python_pca_eigenfaces.png")
 
 
-numFaces = 8
-E = []
-for i in range(0, numFaces):
-    e = U[:,i].reshape(dims)
-    E.append(normalize(e,0,255))
-
-#printVector(meanVector, dims)
-
-subplot(title="Eigenfaces", images=E, rows=numFaces/4, \
-        cols=4, sptitle=" Eigenface", colormap=cm.gist_yarg, \
-        filename="python_pca_eigenfaces.png")
-
-
-#faces = 30
+### reconstruct random test face from computed eigenfaces
+#[testFace, count] = readImages('/Users/tbrady/drive/sw/test_faces/')
+#testFace = np.array(testFace)
+#T = np.empty((testFace[0].size, 0), dtype='float64')
+#T = np.reshape(testFace, testFace[0].size)
+#
+#faces = 400
+#
 #reconFace = meanVector
 ##
-#psi = L[:,0] - meanVector
+#psi = T - meanVector
 #w = np.dot(U[:,0].T, psi)
 #w = np.dot(U[:,0:faces].T, psi)
 #for i in range(0,faces):
@@ -83,16 +84,4 @@ subplot(title="Eigenfaces", images=E, rows=numFaces/4, \
 #
 #printVector(reconFace, dims)
 
-#
-##steps = [i for i in range(10, min(len(trainingFaceMatrix),320), 20)]
-#steps = [10,20]
-#E = []
-#for i in range(min(len(steps),16)):
-#    numEvs = steps[i]
-#    P = project(eigenvectors[:,0:numEvs],trainingFaces[0].reshape(-1, 1) , averageFaceVector)
-#    R = reconstruct(eigenvectors[:,0:numEvs ], P , averageFaceVector)
-#    
-#    
-#    R = R.reshape(trainingFaces[0].shape)
-#    E.append(normalize(R,0,255))
 
