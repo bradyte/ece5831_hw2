@@ -17,9 +17,9 @@ if 1:
     vecLen  = tFaces[0].size                    # length of the gamma vector m x n
 
 ## being PCA 
-    L = np.empty((vecLen, 0), dtype='float64')  # initialize an empty vector of m x n length
+    L       = np.empty((vecLen, 0), dtype='float64')  # initialize an empty vector of m x n length
     for col in tFaces:                          # create a matrix, gamma, of image vectors as long as the number of faces
-        L = np.hstack((L ,np.asarray(col).reshape(-1, 1)))
+        L   = np.hstack((L ,np.asarray(col).reshape(-1, 1)))
     meanVector  = np.array(L.mean(axis=1))      # average the vectors to create and average face
 #    printVector(meanVector, dims)               # display the average face
     A       = (L.T - meanVector).T              # subtract the mean vector from the original images
@@ -44,25 +44,28 @@ for i in range(0, numFaces):
 #testFace = np.array(testFace)
 #T = np.empty((testFace[0].size, 0), dtype='float64')
 #T = np.reshape(testFace, testFace[0].size)
-#
+
 
 # face to reconstruct 
-T = L[:,0]
+T           = L[:,45]
 # number of eigenfaces to use    
-faces = [10, 50, 100, 150, 200, 250, 300, 350]
-# start with the average face
-reconFace = meanVector
+faces       = [10, 50, 100, 150, 200, 250, 300, 350]
 
-psi = T - meanVector
 
-#for j in range(0, len(faces)):
-R = []
-reconFace = meanVector
-j = 7
-w = np.dot(U[:,0:faces[j]].T, psi)
-for i in range(0,faces[j]):
-    reconFace += w[i]*U[:,i]
+psi         = T - meanVector
+R=[]
 
-printVector(reconFace, dims)
-rmse = np.sqrt(((reconFace - T) ** 2).mean())
-print(rmse)
+for j in range(0,len(faces)):
+    reconFace   = meanVector # start with the average face
+    w = None
+    rmse = 0
+    w = np.dot(U[:,0:faces[j]].T, psi)
+    for i in range(0,faces[j]):
+        reconFace += w[i]*U[:,i]
+    r = reconFace.reshape(dims)
+    R.append(normalize(r,0,255))
+    
+    #printVector(reconFace, dims)
+    rmse = np.sqrt((((reconFace - T)/255)**2).mean())
+#    print(rmse)
+subplot(title="Eigenfaces", images=R, sptitle=" Eigenface", colormap=cm.gray)
