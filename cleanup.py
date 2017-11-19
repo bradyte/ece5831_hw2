@@ -14,33 +14,42 @@ import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 
 
-def printVector(v, dims):
-    e = v.reshape(dims)
-    e = normalize(e,0,255)
-    plt.axis('off')
+def printVector(v, dims, title=None):
+    plt.figure()
+    e = v.reshape(dims)     # reshape to original image dimensions
+    e = normalize(e,0,255)  # convert to grayscale range
+    plt.axis('off')         # turn off axis
+    plt.title(title)
     plt.imshow(e, cmap=cm.gray)
     
-def normalize(X, low, high):
-    X = np.asarray(X)
-    minX , maxX = np.min(X), np.max(X)
-    X = (X - float(minX)) / float((maxX - minX))        # normalize
-    X = X * (high-low) + low                            # scale from low to high
-    return np.asarray(X) 
+def normalize(arr, low, high):
+    arr     = np.asarray(arr)
+    minVal  = np.min(arr)   # find minimum value
+    maxVal  = np.max(arr)   # find maximum value
+    arr     = (arr - float(minVal)) / float((maxVal - minVal))  # normalize
+    arr     = (arr * (maxVal - minVal)) + minVal                # scale from low to high
+    return np.asarray(arr) 
 
 
-def subplot(title, images, sptitle='subplot', colormap=cm.gray):
+def subplot(title, images, sptitle='subplot', colormap=cm.gray, num=None):
     fig = plt.figure()
     fig.suptitle(title, horizontalalignment='center')
-    
-    for i in range(len(images)):
-        ax0 = fig.add_subplot(2, 4,(i+1))
-        plt.title('#%d %s' % ((i+1), sptitle), fontsize = 10)
-        plt.imshow(np.asarray(images[i]), cmap=colormap)
-        plt.axis('off')
+    if num == None:
+        for i in range(len(images)):
+            fig.add_subplot(2, 4,(i+1))
+            plt.title('#%d %s' % ((i+1), sptitle), fontsize = 10)
+            plt.imshow(np.asarray(images[i]), cmap=colormap)
+            plt.axis('off')
+    else:
+        for i in range(len(images)):
+            fig.add_subplot(2, 4,(i+1))
+            plt.title('%d %s' % (num[i], sptitle), fontsize = 10)
+            plt.imshow(np.asarray(images[i]), cmap=colormap)
+            plt.axis('off')
 
 
 # read in all the images
-def readImages(path, sz=None): 
+def readImages(path): 
     c = 0
     X,y = [], []
     for dirname , dirnames , filenames in os.walk(path):
@@ -48,12 +57,9 @@ def readImages(path, sz=None):
             subject_path = os.path.join(dirname , subdirname)
             for filename in os.listdir(subject_path):
                 try:
-                    im = Image.open(os.path.join(subject_path , filename))
+                    im = Image.open(os.path.join(subject_path, filename))
                     im = im.convert("L")
-                    # resize to given size (if given)
-                    if (sz is not None):
-                        im = im.resize(sz, Image.ANTIALIAS)
-                    X.append(np.asarray(im, dtype=np.uint8))
+                    X.append(np.asarray(im, dtype=np.float))
                     y.append(c)
                 except IOError as err:
                     print ("I/O error: {0}".format(err))
