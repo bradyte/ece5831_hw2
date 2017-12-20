@@ -39,14 +39,14 @@ for i in range(0, numFaces):
 subplot(title="Eigenfaces", images=E, sptitle=" Eigenface", colormap=cm.gist_yarg)
 
 ## reconstruct face from training set
-T           = L[:,0]
+#T           = L[:,0]
 
 ## reconstruct random test face from computed eigenfaces
-#k          = 1
-#[testFace, count] = readImages('/Users/tbrady/drive/sw/test_faces/')
-#testFace    = np.array(testFace)
-#T           = np.empty((testFace[0].size, 0), dtype='float64')
-#T           = np.reshape(testFace[k], testFace[0].size)
+k          = 1
+[testFace, count] = readImages('/Users/tbrady/drive/sw/test_faces/')
+testFace    = np.array(testFace)
+T           = np.empty((testFace[0].size, 0), dtype='float64')
+T           = np.reshape(testFace[k], testFace[0].size)
 
 ## reconstruct faces from eigenfaces
 # number of eigenfaces to use    
@@ -77,4 +77,5 @@ plt.figure()
 plt.title('Eigenface Reconstruction')
 plt.ylabel('RMSE')
 plt.xlabel('Sets of eigenfaces')
+plt.ylim(0, 0.6)
 plt.plot(err)
